@@ -1,6 +1,7 @@
 import React, { SyntheticEvent } from 'react';
 import styled from '@emotion/styled';
 import clsx from 'clsx';
+import { colorToken } from '../../tokens/color';
 
 const StyledIcon = styled.span<{
     fontSize?: string;
@@ -8,7 +9,7 @@ const StyledIcon = styled.span<{
     hoverColor?: string;
 }>`
     font-size: ${({ fontSize }) => fontSize || '16px'};
-    color: ${({ color }) => color || 'rgb(148, 148, 149)'};
+    color: ${({ color }) => color || colorToken.lightGray};
     transition: color 0.3s ease;
 
     &:hover {

@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 
 export const LayoutContainer = styled.div`
-    width: 100vw;
-    min-height: 100vh;
+    width: 100%;
+    padding-bottom: 16px;
 `;
 
 export const LayoutContent = styled.main`

@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { colorToken } from '../../tokens/color';
 
 export const ContactCardContainer = styled.div`
     display: flex;
@@ -20,7 +21,7 @@ export const ContactCardContainer = styled.div`
 export const Avatar = styled.div<{ bgColor?: string }>`
     width: 48px;
     height: 48px;
-    background-color: ${(props) => props.bgColor || '#007bff'};
+    background-color: ${(props) => props.bgColor || colorToken.blue};
     color: #fff;
     display: flex;
     justify-content: center;
@@ -40,7 +41,7 @@ export const ContactRightSide = styled.div`
 export const Name = styled.h3`
     font-size: 18px;
     margin: 0;
-    color: rgb(77, 77, 79);
+    color: ${colorToken.gray};
 `;
 
 export const PhoneNumber = styled.p`

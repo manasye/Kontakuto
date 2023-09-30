@@ -15,12 +15,20 @@ export default function AllContact() {
 
     // Dummy contact data
     const contacts = [
-        { name: 'Alice Brown', phoneNumber: '123-456-7890' },
-        { name: 'Charlie Davis', phoneNumber: '987-654-3210' },
-        { name: 'Emily Foster', phoneNumber: '555-123-4567' },
-        { name: 'Charlie Davis', phoneNumber: '987-654-3210' },
-        { name: 'Emily Foster', phoneNumber: '555-123-4567' },
-        { name: 'Alice Brown', phoneNumber: '123-456-7890' }
+        { firstName: 'Alice', lastName: 'Brown', phoneNumber: '123-456-7890' },
+        {
+            firstName: 'Charlie',
+            lastName: 'Davis',
+            phoneNumber: '987-654-3210'
+        },
+        { firstName: 'Emily', lastName: 'Foster', phoneNumber: '555-123-4567' },
+        {
+            firstName: 'Charlie',
+            lastName: 'Davis',
+            phoneNumber: '987-654-3210'
+        },
+        { firstName: 'Emily', lastName: 'Foster', phoneNumber: '555-123-4567' },
+        { firstName: 'Alice', lastName: 'Brown', phoneNumber: '123-456-7890' }
         // Add more contacts as needed
     ];
 

@@ -10,10 +10,30 @@ code {
         monospace;
 }
 
+.mt-4 {
+    margin-top: 4px;
+}
+
+.mt-8 {
+    margin-top: 8px;
+}
+
 .mr-4 {
     margin-right: 4px;
 }
 
 .mr-8 {
     margin-right: 8px;
+}
+
+.pt-4 {
+    padding-top: 4px;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.font-medium {
+    font-weight: 500;
 }

@@ -1,6 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import styled from '@emotion/styled';
 import Icons from '../Icons';
+import { colorToken } from '../../tokens/color';
 
 const SearchInputContainer = styled.div`
     display: flex;
@@ -23,8 +24,8 @@ const Input = styled.input`
     font-size: 16px;
     outline: none;
     margin-left: 4px;
-    x ::placeholder {
-        color: rgb(148, 148, 149);
+    ::placeholder {
+        color: ${colorToken.lightGray};
     }
 `;
 

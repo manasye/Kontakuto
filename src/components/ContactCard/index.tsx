@@ -9,9 +9,11 @@ import {
 } from './index.style';
 import { generateColorFromInitials } from '../../utils/color';
 import Icons from '../Icons';
+import { colorToken } from '../../tokens/color';
 
 interface ContactCardProps {
-    name: string;
+    firstName: string;
+    lastName: string;
     phoneNumber: string;
     onClick?: () => void;
     handleDelete?: (e: SyntheticEvent) => void;
@@ -19,18 +21,14 @@ interface ContactCardProps {
 }
 
 const ContactCard: React.FC<ContactCardProps> = ({
-    name,
+    firstName,
+    lastName,
     phoneNumber,
     onClick,
     handleDelete,
     handleFavorite
 }) => {
-    const initials = name
-        .split(' ')
-        .map((word) => word[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase();
+    const initials = firstName[0] + lastName[0];
     const bgColor = generateColorFromInitials(initials);
 
     return (
@@ -38,13 +36,15 @@ const ContactCard: React.FC<ContactCardProps> = ({
             <Avatar bgColor={bgColor}>{initials}</Avatar>
             <ContactRightSide>
                 <div>
-                    <Name>{name}</Name>
+                    <Name>
+                        {firstName} {lastName}
+                    </Name>
                     <PhoneNumber>{phoneNumber}</PhoneNumber>
                 </div>
                 <ActionButtons>
                     <Icons
                         name="delete"
-                        hoverColor="#FA6363"
+                        hoverColor={colorToken.red}
                         fontSize="20px"
                         className="mr-4"
                         onClick={handleDelete}
