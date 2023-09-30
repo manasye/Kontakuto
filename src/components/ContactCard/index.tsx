@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { SyntheticEvent } from 'react';
 import {
-    ActionButton,
     ActionButtons,
     Avatar,
     ContactCardContainer,
@@ -9,13 +8,23 @@ import {
     PhoneNumber
 } from './index.style';
 import { generateColorFromInitials } from '../../utils/color';
+import Icons from '../Icons';
 
 interface ContactCardProps {
     name: string;
     phoneNumber: string;
+    onClick?: () => void;
+    handleDelete?: (e: SyntheticEvent) => void;
+    handleFavorite?: (e: SyntheticEvent) => void;
 }
 
-const ContactCard: React.FC<ContactCardProps> = ({ name, phoneNumber }) => {
+const ContactCard: React.FC<ContactCardProps> = ({
+    name,
+    phoneNumber,
+    onClick,
+    handleDelete,
+    handleFavorite
+}) => {
     const initials = name
         .split(' ')
         .map((word) => word[0])
@@ -25,7 +34,7 @@ const ContactCard: React.FC<ContactCardProps> = ({ name, phoneNumber }) => {
     const bgColor = generateColorFromInitials(initials);
 
     return (
-        <ContactCardContainer>
+        <ContactCardContainer onClick={onClick}>
             <Avatar bgColor={bgColor}>{initials}</Avatar>
             <ContactRightSide>
                 <div>
@@ -33,8 +42,19 @@ const ContactCard: React.FC<ContactCardProps> = ({ name, phoneNumber }) => {
                     <PhoneNumber>{phoneNumber}</PhoneNumber>
                 </div>
                 <ActionButtons>
-                    <ActionButton title="Favorite">⭐</ActionButton>
-                    <ActionButton title="Delete">❌</ActionButton>
+                    <Icons
+                        name="delete"
+                        hoverColor="#FA6363"
+                        fontSize="20px"
+                        className="mr-4"
+                        onClick={handleDelete}
+                    />
+                    <Icons
+                        name="star"
+                        hoverColor="#FFD700"
+                        fontSize="20px"
+                        onClick={handleFavorite}
+                    />
                 </ActionButtons>
             </ContactRightSide>
         </ContactCardContainer>

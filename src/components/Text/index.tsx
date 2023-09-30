@@ -7,7 +7,7 @@ interface Props {
 }
 
 const StyledText = styled.p`
-    font-size: 15px;
+    font-size: 16px;
     margin: 4px 0;
     color: ${(props) => props.color || 'rgb(148, 148, 149)'};
 `;
