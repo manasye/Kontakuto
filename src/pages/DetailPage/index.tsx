@@ -5,34 +5,50 @@ import { useParams } from 'react-router-dom';
 import ContactInputForm from './ContactInputForm';
 import ContactDetail, { ContactDetailProps } from './ContactDetail';
 import Icons from '../../components/Icons';
-
-const data = {
-    firstName: 'Alice',
-    lastName: 'Brown',
-    phoneNumbers: [
-        { value: '08134455555' },
-        { value: '08134455555' },
-        { value: '08134455555' }
-    ]
-};
+import useGetContact from '../../hooks/api/useGetContact';
+import BarSkeletonGroup from '../../components/BarSkeletonGroup';
 
 enum PAGE_STATE {
     VIEW_MODE,
     EDIT_MODE
 }
 
+const INITIAL_FORM_DATA = {
+    firstName: '',
+    lastName: '',
+    phoneNumbers: []
+};
+
 export default function DetailPage() {
     const [pageState, setPageState] = useState(PAGE_STATE.VIEW_MODE);
-    const [formData, setFormData] = useState<Partial<ContactDetailProps>>(data);
+    const [formData, setFormData] =
+        useState<ContactDetailProps>(INITIAL_FORM_DATA);
+
     const param = useParams();
-    const isNewContant = param.id === 'new';
+    const isNewContact = param.id === 'new';
+    const { data: contactData, loading } = useGetContact(
+        isNewContact ? -1 : Number(param.id)
+    );
 
     useEffect(() => {
-        if (isNewContant) {
+        if (isNewContact) {
             setPageState(PAGE_STATE.EDIT_MODE);
-            setFormData({});
+            setFormData(INITIAL_FORM_DATA);
         }
-    }, [isNewContant]);
+    }, [isNewContact]);
+
+    useEffect(() => {
+        if (contactData?.contact_by_pk) {
+            setFormData({
+                firstName: contactData?.contact_by_pk.first_name,
+                lastName: contactData?.contact_by_pk.last_name,
+                phoneNumbers:
+                    contactData?.contact_by_pk.phones?.map((ph) => ({
+                        value: ph.number
+                    })) || []
+            });
+        }
+    }, [contactData?.contact_by_pk]);
 
     const setToEditMode = useCallback(() => {
         setPageState(PAGE_STATE.EDIT_MODE);
@@ -42,23 +58,35 @@ export default function DetailPage() {
         setPageState(PAGE_STATE.VIEW_MODE);
     }, []);
 
-    return (
-        <>
-            <Title
-                text={isNewContant ? 'New Contact' : 'Contact Detail'}
-                withArrowBack
-            />
-            {pageState === PAGE_STATE.VIEW_MODE ? (
+    const renderBasedOnState = useCallback(() => {
+        if (loading) {
+            return (
+                <div className="mt-16">
+                    <BarSkeletonGroup />
+                </div>
+            );
+        }
+        if (pageState === PAGE_STATE.VIEW_MODE) {
+            return (
                 <>
-                    <ContactDetail {...data} />
+                    <ContactDetail {...formData} />
                     <Button onClick={setToEditMode}>
                         <Icons name="edit" color="white" className="mr-4" />{' '}
                         Edit Contact
                     </Button>
                 </>
-            ) : (
-                <ContactInputForm {...formData} handleCancel={setToViewMode} />
-            )}
+            );
+        }
+        return <ContactInputForm {...formData} handleCancel={setToViewMode} />;
+    }, [formData, loading, pageState, setToEditMode, setToViewMode]);
+
+    return (
+        <>
+            <Title
+                text={isNewContact ? 'New Contact' : 'Contact Detail'}
+                withArrowBack
+            />
+            {renderBasedOnState()}
         </>
     );
 }

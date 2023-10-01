@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client';
 import GET_ALL_CONTACTS from '../../gql/query/getAllContacts';
 import debounce from 'lodash.debounce';
 import { useEffect } from 'react';
-import GetContactsResponse from '../../types/GetContactsResponse';
+import GetContactListResponse from '../../types/GetContactListResponse';
 import { useFavoritesContext } from '../../context/FavoriteContext';
 
 export const PER_PAGE = 10;
@@ -11,7 +11,7 @@ const DEBOUNCE_INTERVAL = 300;
 export default function useGetAllContacts(query = '', page = 1) {
     const { favoriteIds } = useFavoritesContext();
 
-    const { data, refetch, loading, error } = useQuery<GetContactsResponse>(
+    const { data, refetch, loading, error } = useQuery<GetContactListResponse>(
         GET_ALL_CONTACTS,
         {
             variables: {

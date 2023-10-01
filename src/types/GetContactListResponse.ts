@@ -1,6 +1,6 @@
 import Contact from './Contact';
 
-export default interface GetContactsResponse {
+export default interface GetContactListResponse {
     contact: Contact[];
     contact_aggregate: {
         aggregate: {
