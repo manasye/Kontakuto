@@ -42,6 +42,14 @@ export const Name = styled.h3`
     font-size: 18px;
     margin: 0;
     color: ${colorToken.gray};
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 230px;
+
+    @media (min-width: 768px) {
+        max-width: 180px;
+    }
 `;
 
 export const PhoneNumber = styled.p`
