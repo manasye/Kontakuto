@@ -10,7 +10,11 @@ import Icons from '../../components/Icons';
 const data = {
     firstName: 'Alice',
     lastName: 'Brown',
-    phoneNumbers: ['123-456-7890', '123-456-7890', '123-456-7890']
+    phoneNumbers: [
+        { value: '08134455555' },
+        { value: '08134455555' },
+        { value: '08134455555' }
+    ]
 };
 
 enum PAGE_STATE {

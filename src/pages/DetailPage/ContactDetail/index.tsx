@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 export interface ContactDetailProps {
     firstName: string;
     lastName: string;
-    phoneNumbers: string[];
+    phoneNumbers: { value: string }[];
 }
 
 const Container = styled.div`
@@ -21,6 +21,7 @@ export const NameContainer = styled.div`
         flex-direction: row;
         div {
             flex: 1;
+            align-self: flex-start;
             &:first-of-type {
                 margin-right: 16px;
             }
@@ -52,7 +53,7 @@ export default function ContactDetail({
             </NameContainer>
             <Text text="Phone Numbers" className="pt-4" />
             <StyledUl>
-                {phoneNumbers.map((number) => (
+                {phoneNumbers.map(({ value: number }) => (
                     <li>
                         <Text text={number} className="font-medium" />
                     </li>

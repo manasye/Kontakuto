@@ -20,9 +20,12 @@ const variantStyles = {
 const StyledButton = styled.button<{
     variant?: keyof typeof variantStyles;
     size?: string;
+    disabled?: boolean; // Add a disabled prop
 }>`
     background-color: ${(props) =>
-        variantStyles[props.variant || 'primary'].backgroundColor};
+        props.disabled
+            ? '#ccc'
+            : variantStyles[props.variant || 'primary'].backgroundColor};
     color: ${(props) =>
         props.variant === 'secondary' ? colorToken.blue : 'white'};
     padding: ${(props) => (props.size === 'md' ? '8px 16px' : '4px 10px')};
@@ -32,13 +35,15 @@ const StyledButton = styled.button<{
             : 'none'};
     display: flex;
     border-radius: 5px;
-    cursor: pointer;
+    cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
     font-size: 13px;
     transition: background-color 0.3s ease-in-out;
     align-items: center;
+    opacity: ${(props) => (props.disabled ? 0.7 : 1)};
 
     &:hover {
         background-color: ${(props) =>
+            !props.disabled &&
             variantStyles[props.variant || 'primary'].hoverBackgroundColor};
     }
 
@@ -53,6 +58,8 @@ interface ButtonProps {
     children: React.ReactNode;
     onClick?: () => void;
     className?: string;
+    type?: 'button' | 'reset' | 'submit';
+    disabled?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -60,14 +67,18 @@ const Button: React.FC<ButtonProps> = ({
     size = 'md',
     children,
     onClick,
-    className
+    className,
+    type = 'button',
+    disabled
 }) => {
     return (
         <StyledButton
             onClick={onClick}
             className={className}
             variant={variant}
-            size={size}>
+            size={size}
+            type={type}
+            disabled={disabled}>
             {children}
         </StyledButton>
     );

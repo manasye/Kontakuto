@@ -1,57 +1,146 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TextInput from '../../../components/Input/Input';
 import styled from '@emotion/styled';
 import { ContactDetailProps, NameContainer } from '../ContactDetail';
 import { InputContainer, Label } from '../../../components/Input/Input.style';
 import Button from '../../../components/Button';
 import Icons from '../../../components/Icons';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { phoneNumberCheck } from '../../../utils/regex';
 
 interface Props extends ContactDetailProps {
     handleCancel: () => void;
 }
 
-const Container = styled.div`
+const Container = styled.form`
     padding-bottom: 12px;
 `;
 
 const ButtonContainer = styled.div`
     display: flex;
+    margin-top: 24px;
 `;
 
 export default function InputForm({
     firstName,
     lastName,
-    phoneNumbers,
+    phoneNumbers = [],
     handleCancel
 }: Props) {
+    const {
+        handleSubmit,
+        control,
+        formState: { errors, isValid },
+        trigger
+    } = useForm<ContactDetailProps>({
+        mode: 'onBlur',
+        defaultValues: {
+            firstName,
+            lastName,
+            phoneNumbers
+        }
+    });
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: 'phoneNumbers'
+    });
+
+    const onSubmit = (data: ContactDetailProps) => {
+        console.log(data);
+    };
+
+    const validateFirstName = (value: string) => {
+        if (value) {
+            return true;
+        } else {
+            return 'First name is required';
+        }
+    };
+
+    const validateLastName = (value: string) => {
+        if (value) {
+            return true;
+        } else {
+            return 'Last name is required';
+        }
+    };
+
+    const validatePhoneNumber = ({ value }: { value: string }) => {
+        return phoneNumberCheck(value) || 'Phone Number must be valid';
+    };
+
     return (
-        <Container>
+        <Container onSubmit={handleSubmit(onSubmit)}>
             <NameContainer>
-                <TextInput
-                    label="First Name"
-                    value={firstName}
-                    onChange={() => {}}
+                <Controller
+                    name="firstName"
+                    control={control}
+                    defaultValue={firstName || ''}
+                    rules={{ validate: validateFirstName }}
+                    render={({ field }) => (
+                        <TextInput
+                            label="First Name"
+                            value={field.value}
+                            onChange={(value) => {
+                                field.onChange(value);
+                                trigger('firstName');
+                            }}
+                            errorMessage={errors.firstName?.message}
+                        />
+                    )}
                 />
-                <TextInput
-                    label="Last Name"
-                    value={lastName}
-                    onChange={() => {}}
+                <Controller
+                    name="lastName"
+                    control={control}
+                    defaultValue={lastName || ''}
+                    rules={{ validate: validateLastName }}
+                    render={({ field }) => (
+                        <TextInput
+                            label="Last Name"
+                            value={field.value}
+                            onChange={(value) => {
+                                field.onChange(value);
+                                trigger('lastName');
+                            }}
+                            errorMessage={errors.lastName?.message}
+                        />
+                    )}
                 />
             </NameContainer>
-            <InputContainer>
+
+            <div className="mb-8">
                 <Label>Phone Number</Label>
-                {phoneNumbers.map((number) => (
-                    <TextInput
-                        value={number}
-                        onChange={() => {}}
-                        appendedButton={
-                            <Button variant="danger" size="sm">
-                                <Icons name="delete" color="white" />
-                            </Button>
-                        }
-                    />
-                ))}
-            </InputContainer>
+            </div>
+            {fields.map((field, index) => (
+                <Controller
+                    key={field.id}
+                    name={`phoneNumbers.${index}`}
+                    control={control}
+                    rules={{ validate: validatePhoneNumber }}
+                    render={({ field }) => (
+                        <TextInput
+                            value={field.value.value}
+                            onChange={(value) => {
+                                field.onChange({ value });
+                                trigger(`phoneNumbers.${index}`);
+                            }}
+                            appendedButton={
+                                <Button
+                                    variant="danger"
+                                    size="sm"
+                                    onClick={() => remove(index)}>
+                                    <Icons name="delete" color="white" />
+                                </Button>
+                            }
+                            errorMessage={errors.phoneNumbers?.[index]?.message}
+                        />
+                    )}
+                />
+            ))}
+
+            <Button onClick={() => append({ value: '' })}>
+                <Icons name="add" color="white" className="mr-4" /> New Number
+            </Button>
 
             <ButtonContainer>
                 <Button
@@ -60,7 +149,9 @@ export default function InputForm({
                     className="mr-8">
                     Cancel
                 </Button>
-                <Button variant="primary">Save</Button>
+                <Button variant="primary" type="submit" disabled={!isValid}>
+                    Save
+                </Button>
             </ButtonContainer>
         </Container>
     );
