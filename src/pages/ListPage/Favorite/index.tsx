@@ -8,11 +8,20 @@ import ContactContainer from '../../../components/ContactContainer';
 import ContactCard from '../../../components/ContactCard';
 import { useNavigate } from 'react-router-dom';
 import { useFavoritesContext } from '../../../context/FavoriteContext';
+import useDeleteContact from '../../../hooks/api/useDeleteContact';
+import useGetAllContacts from '../../../hooks/api/useGetAllContacts';
 
-export default function Favorite() {
+interface Props {
+    searchQuery: string;
+    page: number;
+}
+
+export default function Favorite({ searchQuery, page }: Props) {
+    const navigate = useNavigate();
     const { favoriteIds, removeFavorite } = useFavoritesContext();
     const { data } = useGetContactListByIds(favoriteIds);
-    const navigate = useNavigate();
+    const { deleteContact } = useDeleteContact();
+    const { refetch } = useGetAllContacts(searchQuery, page);
 
     const favContacts = useMemo(() => {
         return data?.contact.map(mapContactData) || [];
@@ -33,6 +42,19 @@ export default function Favorite() {
         [removeFavorite]
     );
 
+    const handleDelete = useCallback(
+        (e: SyntheticEvent, id: number) => {
+            e.stopPropagation();
+            deleteContact(id, {
+                onSuccess: () => {
+                    removeFavorite(id);
+                    refetch();
+                }
+            });
+        },
+        [deleteContact, refetch, removeFavorite]
+    );
+
     return (
         <>
             <Title text={`Favorites (${favContacts.length})`} />
@@ -43,7 +65,9 @@ export default function Favorite() {
                             {...contact}
                             key={contact.id}
                             onClick={() => navigateToContactDetail(contact.id)}
-                            handleDelete={() => {}}
+                            handleDelete={(e) => {
+                                handleDelete(e, contact.id);
+                            }}
                             handleToggleFav={(e) =>
                                 handleToggleFav(e, contact.id)
                             }

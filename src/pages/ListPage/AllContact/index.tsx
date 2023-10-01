@@ -16,6 +16,7 @@ import { mapContactData } from '../utils';
 import { useFavoritesContext } from '../../../context/FavoriteContext';
 import { colorToken } from '../../../tokens/color';
 import Text from '../../../components/Text';
+import useDeleteContact from '../../../hooks/api/useDeleteContact';
 
 const TitleContainer = styled.div`
     display: flex;
@@ -27,15 +28,30 @@ const TitleContainer = styled.div`
     }
 `;
 
-export default function AllContact() {
+interface Props {
+    searchQuery: string;
+    setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+    page: number;
+    setPage: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export default function AllContact({
+    searchQuery,
+    setSearchQuery,
+    page,
+    setPage
+}: Props) {
     const navigate = useNavigate();
     const { addNewFavorite } = useFavoritesContext();
-    const [searchValue, setSearchValue] = useState('');
-    const [page, setPage] = useState(1);
-    const { data: contactData, loading } = useGetAllContacts(searchValue, page);
+    const {
+        data: contactData,
+        loading,
+        refetch
+    } = useGetAllContacts(searchQuery, page);
+    const { loading: isLoadingDelete, deleteContact } = useDeleteContact();
 
     const handleSearchChange = (value: string) => {
-        setSearchValue(value);
+        setSearchQuery(value);
         setPage(1);
     };
 
@@ -54,9 +70,17 @@ export default function AllContact() {
         navigate('/detail/new');
     }, [navigate]);
 
-    const handleDelete = useCallback((e: SyntheticEvent) => {
-        e.stopPropagation();
-    }, []);
+    const handleDelete = useCallback(
+        (e: SyntheticEvent, id: number) => {
+            e.stopPropagation();
+            deleteContact(id, {
+                onSuccess: () => {
+                    refetch();
+                }
+            });
+        },
+        [deleteContact, refetch]
+    );
 
     const handleFavorite = useCallback(
         (e: SyntheticEvent, id: number) => {
@@ -78,7 +102,7 @@ export default function AllContact() {
                     Contact
                 </Button>
             </TitleContainer>
-            <SearchInput value={searchValue} onChange={handleSearchChange} />
+            <SearchInput value={searchQuery} onChange={handleSearchChange} />
             {loading ? (
                 <BarSkeletonGroup />
             ) : totalItems === 0 ? (
@@ -93,7 +117,7 @@ export default function AllContact() {
                             {...contact}
                             key={contact.id}
                             onClick={() => navigateToContactDetail(contact.id)}
-                            handleDelete={handleDelete}
+                            handleDelete={(e) => handleDelete(e, contact.id)}
                             handleToggleFav={(e) =>
                                 handleFavorite(e, contact.id)
                             }

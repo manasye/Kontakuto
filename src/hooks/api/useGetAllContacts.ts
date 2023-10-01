@@ -40,6 +40,7 @@ export default function useGetAllContacts(query = '', page = 1) {
 
     return {
         data,
+        refetch,
         loading: loading && !data,
         error
     };
