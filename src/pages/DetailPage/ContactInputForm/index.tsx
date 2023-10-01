@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
 import TextInput from '../../../components/Input/Input';
 import styled from '@emotion/styled';
 import { ContactDetailProps, NameContainer } from '../ContactDetail';
-import { InputContainer, Label } from '../../../components/Input/Input.style';
+import { Label } from '../../../components/Input/Input.style';
 import Button from '../../../components/Button';
 import Icons from '../../../components/Icons';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { phoneNumberCheck } from '../../../utils/regex';
 
-interface Props extends ContactDetailProps {
+interface Props extends Partial<ContactDetailProps> {
     handleCancel: () => void;
 }
 
@@ -49,25 +49,25 @@ export default function InputForm({
         console.log(data);
     };
 
-    const validateFirstName = (value: string) => {
+    const validateFirstName = useCallback((value: string) => {
         if (value) {
             return true;
         } else {
             return 'First name is required';
         }
-    };
+    }, []);
 
-    const validateLastName = (value: string) => {
+    const validateLastName = useCallback((value: string) => {
         if (value) {
             return true;
         } else {
             return 'Last name is required';
         }
-    };
+    }, []);
 
-    const validatePhoneNumber = ({ value }: { value: string }) => {
+    const validatePhoneNumber = useCallback(({ value }: { value: string }) => {
         return phoneNumberCheck(value) || 'Phone Number must be valid';
-    };
+    }, []);
 
     return (
         <Container onSubmit={handleSubmit(onSubmit)}>

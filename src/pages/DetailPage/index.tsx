@@ -1,10 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import Title from '../../components/Title';
 import Button from '../../components/Button';
 import { useParams } from 'react-router-dom';
 import ContactInputForm from './ContactInputForm';
-import ContactDetail from './ContactDetail';
+import ContactDetail, { ContactDetailProps } from './ContactDetail';
 import Icons from '../../components/Icons';
 
 const data = {
@@ -24,6 +24,16 @@ enum PAGE_STATE {
 
 export default function DetailPage() {
     const [pageState, setPageState] = useState(PAGE_STATE.VIEW_MODE);
+    const [formData, setFormData] = useState<Partial<ContactDetailProps>>(data);
+    const param = useParams();
+    const isNewContant = param.id === 'new';
+
+    useEffect(() => {
+        if (isNewContant) {
+            setPageState(PAGE_STATE.EDIT_MODE);
+            setFormData({});
+        }
+    }, [isNewContant]);
 
     const setToEditMode = useCallback(() => {
         setPageState(PAGE_STATE.EDIT_MODE);
@@ -35,7 +45,10 @@ export default function DetailPage() {
 
     return (
         <>
-            <Title text="Contact Detail" withArrowBack />
+            <Title
+                text={isNewContant ? 'New Contact' : 'Contact Detail'}
+                withArrowBack
+            />
             {pageState === PAGE_STATE.VIEW_MODE ? (
                 <>
                     <ContactDetail {...data} />
@@ -45,7 +58,7 @@ export default function DetailPage() {
                     </Button>
                 </>
             ) : (
-                <ContactInputForm {...data} handleCancel={setToViewMode} />
+                <ContactInputForm {...formData} handleCancel={setToViewMode} />
             )}
         </>
     );

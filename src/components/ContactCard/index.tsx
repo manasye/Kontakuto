@@ -10,14 +10,16 @@ import {
 import { generateColorFromInitials } from '../../utils/color';
 import Icons from '../Icons';
 import { colorToken } from '../../tokens/color';
+import { default as PhoneNumberType } from '../../types/PhoneNumber';
 
 interface ContactCardProps {
     firstName: string;
     lastName: string;
-    phoneNumber: string;
+    phoneNumber: PhoneNumberType;
     onClick?: () => void;
     handleDelete?: (e: SyntheticEvent) => void;
-    handleFavorite?: (e: SyntheticEvent) => void;
+    handleToggleFav?: (e: SyntheticEvent) => void;
+    isFavorite?: boolean;
 }
 
 const ContactCard: React.FC<ContactCardProps> = ({
@@ -26,9 +28,10 @@ const ContactCard: React.FC<ContactCardProps> = ({
     phoneNumber,
     onClick,
     handleDelete,
-    handleFavorite
+    handleToggleFav,
+    isFavorite
 }) => {
-    const initials = firstName[0] + lastName[0];
+    const initials = firstName[0].toUpperCase() + lastName[0].toUpperCase();
     const bgColor = generateColorFromInitials(initials);
 
     return (
@@ -39,7 +42,7 @@ const ContactCard: React.FC<ContactCardProps> = ({
                     <Name>
                         {firstName} {lastName}
                     </Name>
-                    <PhoneNumber>{phoneNumber}</PhoneNumber>
+                    <PhoneNumber>{phoneNumber.number}</PhoneNumber>
                 </div>
                 <ActionButtons>
                     <Icons
@@ -51,9 +54,10 @@ const ContactCard: React.FC<ContactCardProps> = ({
                     />
                     <Icons
                         name="star"
+                        color={isFavorite ? '#FFD700' : ''}
                         hoverColor="#FFD700"
                         fontSize="20px"
-                        onClick={handleFavorite}
+                        onClick={handleToggleFav}
                     />
                 </ActionButtons>
             </ContactRightSide>
