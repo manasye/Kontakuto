@@ -1,4 +1,4 @@
-import Contact from '../../../types/Contact';
+import Contact from '../../../hooks/types/Contact';
 
 export const mapContactData = (c: Contact) => {
     return {
