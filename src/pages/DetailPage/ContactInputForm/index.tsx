@@ -11,6 +11,7 @@ import useAddContact from "../../../hooks/api/useAddContact";
 import { withSwal } from "react-sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
 import useEditContact from "../../../hooks/api/useEditContact";
+import useCheckExistingName from "../../../hooks/api/useCheckExistingName";
 
 interface Props extends Partial<ContactDetailProps> {
   setToViewMode: () => void;
@@ -28,8 +29,8 @@ const ButtonContainer = styled.div`
 `;
 
 function InputForm({
-  firstName,
-  lastName,
+  firstName = "",
+  lastName = "",
   phoneNumbers = [],
   handleCancel,
   isNew,
@@ -40,7 +41,8 @@ function InputForm({
   const {
     handleSubmit,
     control,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
+    getValues,
     trigger,
   } = useForm<ContactDetailProps>({
     mode: "onBlur",
@@ -56,6 +58,7 @@ function InputForm({
   });
 
   const param = useParams();
+  const { checkExistingName } = useCheckExistingName();
   const { postAddContact, loading: isLoadingAddContact } = useAddContact();
   const { postEditContact, loading: isLoadingEditContact } = useEditContact(
     Number(param.id)
@@ -83,43 +86,79 @@ function InputForm({
           },
         });
       } else {
-        postEditContact(data, {
-          onSuccess: () => {
-            swal.fire({
-              title: "Success",
-              text: "Contact has been edited successfully",
-              icon: "success",
-            });
-            setToViewMode();
-          },
-          onError: () => {
-            swal.fire({
-              title: "Error",
-              text: "Phone number can't be duplicate",
-              icon: "error",
-            });
-          },
-        });
+        postEditContact(
+          data,
+          { firstName, lastName, phoneNumbers },
+          {
+            onSuccess: () => {
+              swal.fire({
+                title: "Success",
+                text: "Contact has been edited successfully",
+                icon: "success",
+              });
+              setToViewMode();
+            },
+            onError: () => {
+              swal.fire({
+                title: "Error",
+                text: "Phone number can't be duplicate",
+                icon: "error",
+              });
+            },
+          }
+        );
       }
     },
-    [isNew, navigate, postAddContact, postEditContact, setToViewMode, swal]
+    [
+      firstName,
+      isNew,
+      lastName,
+      navigate,
+      phoneNumbers,
+      postAddContact,
+      postEditContact,
+      setToViewMode,
+      swal,
+    ]
   );
 
-  const validateFirstName = useCallback((value: string) => {
-    if (value) {
-      return true;
-    } else {
-      return "First name is required";
-    }
-  }, []);
+  const validateFirstName = useCallback(
+    async (value: string) => {
+      if (value) {
+        const isThereExisting = await checkExistingName(
+          value,
+          getValues().lastName
+        );
+        if (isThereExisting) {
+          return "Name must be unique";
+        } else {
+          return true;
+        }
+      } else {
+        return "First name is required";
+      }
+    },
+    [checkExistingName, getValues]
+  );
 
-  const validateLastName = useCallback((value: string) => {
-    if (value) {
-      return true;
-    } else {
-      return "Last name is required";
-    }
-  }, []);
+  const validateLastName = useCallback(
+    async (value: string) => {
+      if (value) {
+        const isThereExisting = await checkExistingName(
+          getValues().firstName,
+          value
+        );
+        if (isThereExisting) {
+          return "Name must be unique";
+        } else {
+          return true;
+        }
+      } else {
+        return "Last name is required";
+      }
+    },
+    [checkExistingName, getValues]
+  );
 
   const validatePhoneNumber = useCallback(({ value }: { value: string }) => {
     return phoneNumberCheck(value) || "Phone Number must be valid";
@@ -206,7 +245,7 @@ function InputForm({
         <Button
           variant="primary"
           type="submit"
-          disabled={!isValid}
+          disabled={!isValid || !isDirty}
           loading={isLoadingAddContact || isLoadingEditContact}
           className="min-w-80"
         >
