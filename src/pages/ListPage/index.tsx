@@ -2,22 +2,33 @@ import React, { useState } from 'react';
 import Divider from '../../components/Divider';
 import AllContact from './AllContact';
 import Favorite from './Favorite';
-import { FavoritesProvider } from '../../context/FavoriteContext';
+import useGetAllContacts from '../../hooks/api/useGetAllContacts';
+import withFavoritesContext from '../../context/FavoriteContext';
 
-export default function ListPage() {
+function ListPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [page, setPage] = useState(1);
+    const {
+        data: contactData,
+        loading: isLoadingGetAllContacts,
+        refetch
+    } = useGetAllContacts(searchQuery, page);
 
     return (
-        <FavoritesProvider>
-            <Favorite searchQuery={searchQuery} page={page} />
+        <>
+            <Favorite refetch={refetch} />
             <Divider />
             <AllContact
+                contactData={contactData}
+                isLoadingGetAllContacts={isLoadingGetAllContacts}
+                refetch={refetch}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 page={page}
                 setPage={setPage}
             />
-        </FavoritesProvider>
+        </>
     );
 }
+
+export default withFavoritesContext(ListPage);

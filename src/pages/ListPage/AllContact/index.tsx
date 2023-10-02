@@ -7,9 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../../../components/Button';
 import Icons from '../../../components/Icons';
 import styled from '@emotion/styled';
-import useGetAllContacts, {
-    PER_PAGE
-} from '../../../hooks/api/useGetAllContacts';
+import { PER_PAGE } from '../../../hooks/api/useGetAllContacts';
 import Pagination from '../../../components/Pagination';
 import BarSkeletonGroup from '../../../components/BarSkeletonGroup';
 import { mapContactData } from '../utils';
@@ -17,6 +15,9 @@ import { useFavoritesContext } from '../../../context/FavoriteContext';
 import { colorToken } from '../../../tokens/color';
 import Text from '../../../components/Text';
 import useDeleteContact from '../../../hooks/api/useDeleteContact';
+import { withSwal } from 'react-sweetalert2';
+import GetContactListResponse from '../../../hooks/types/GetContactListResponse';
+import { ApolloQueryResult, OperationVariables } from '@apollo/client';
 
 const TitleContainer = styled.div`
     display: flex;
@@ -29,25 +30,30 @@ const TitleContainer = styled.div`
 `;
 
 interface Props {
+    contactData: GetContactListResponse;
+    isLoadingGetAllContacts: boolean;
+    refetch: (
+        variables?: Partial<OperationVariables>
+    ) => Promise<ApolloQueryResult<GetContactListResponse>>;
     searchQuery: string;
     setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
     page: number;
     setPage: React.Dispatch<React.SetStateAction<number>>;
+    swal: { fire: (param: unknown) => Promise<{ isConfirmed: boolean }> };
 }
 
-export default function AllContact({
+function AllContact({
+    contactData,
+    isLoadingGetAllContacts,
+    refetch,
     searchQuery,
     setSearchQuery,
     page,
-    setPage
+    setPage,
+    swal
 }: Props) {
     const navigate = useNavigate();
     const { addNewFavorite } = useFavoritesContext();
-    const {
-        data: contactData,
-        loading,
-        refetch
-    } = useGetAllContacts(searchQuery, page);
     const { deleteContact } = useDeleteContact();
 
     const handleSearchChange = (value: string) => {
@@ -73,13 +79,22 @@ export default function AllContact({
     const handleDelete = useCallback(
         (e: SyntheticEvent, id: number) => {
             e.stopPropagation();
-            deleteContact(id, {
-                onSuccess: () => {
-                    refetch();
+            swal.fire({
+                icon: 'question',
+                title: 'One second',
+                text: 'Are you sure want to delete this contact?',
+                showCancelButton: true
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    deleteContact(id, {
+                        onSuccess: () => {
+                            refetch();
+                        }
+                    });
                 }
             });
         },
-        [deleteContact, refetch]
+        [deleteContact, refetch, swal]
     );
 
     const handleFavorite = useCallback(
@@ -103,7 +118,7 @@ export default function AllContact({
                 </Button>
             </TitleContainer>
             <SearchInput value={searchQuery} onChange={handleSearchChange} />
-            {loading ? (
+            {isLoadingGetAllContacts ? (
                 <BarSkeletonGroup />
             ) : totalItems === 0 ? (
                 <Text
@@ -136,3 +151,5 @@ export default function AllContact({
         </>
     );
 }
+
+export default withSwal(AllContact);

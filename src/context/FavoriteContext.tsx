@@ -45,3 +45,15 @@ export const FavoritesProvider: React.FC<{
         </FavoritesContext.Provider>
     );
 };
+
+function withFavoritesContext<P>(Component: React.ComponentType<P>) {
+    return function WrappedComponent(props: P & { children?: ReactNode }) {
+        return (
+            <FavoritesProvider>
+                <Component {...props} />
+            </FavoritesProvider>
+        );
+    };
+}
+
+export default withFavoritesContext;

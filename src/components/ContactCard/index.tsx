@@ -16,6 +16,7 @@ interface ContactCardProps {
     firstName: string;
     lastName: string;
     phoneNumber: PhoneNumberType;
+    phoneNumbersLength: number;
     onClick?: () => void;
     handleDelete?: (e: SyntheticEvent) => void;
     handleToggleFav?: (e: SyntheticEvent) => void;
@@ -26,6 +27,7 @@ const ContactCard: React.FC<ContactCardProps> = ({
     firstName = '',
     lastName = '',
     phoneNumber,
+    phoneNumbersLength,
     onClick,
     handleDelete,
     handleToggleFav,
@@ -42,7 +44,11 @@ const ContactCard: React.FC<ContactCardProps> = ({
                     <Name>
                         {firstName} {lastName}
                     </Name>
-                    <PhoneNumber>{phoneNumber?.number}</PhoneNumber>
+                    <PhoneNumber>
+                        {phoneNumber?.number}
+                        {phoneNumbersLength > 1 &&
+                            `, and ${phoneNumbersLength - 1} more...`}
+                    </PhoneNumber>
                 </div>
                 <ActionButtons>
                     <Icons

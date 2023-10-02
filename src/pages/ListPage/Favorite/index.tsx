@@ -9,19 +9,22 @@ import ContactCard from '../../../components/ContactCard';
 import { useNavigate } from 'react-router-dom';
 import { useFavoritesContext } from '../../../context/FavoriteContext';
 import useDeleteContact from '../../../hooks/api/useDeleteContact';
-import useGetAllContacts from '../../../hooks/api/useGetAllContacts';
+import { withSwal } from 'react-sweetalert2';
+import { ApolloQueryResult, OperationVariables } from '@apollo/client';
+import GetContactListResponse from '../../../hooks/types/GetContactListResponse';
 
 interface Props {
-    searchQuery: string;
-    page: number;
+    refetch: (
+        variables?: Partial<OperationVariables>
+    ) => Promise<ApolloQueryResult<GetContactListResponse>>;
+    swal: { fire: (param: unknown) => Promise<{ isConfirmed: boolean }> };
 }
 
-export default function Favorite({ searchQuery, page }: Props) {
+function Favorite({ refetch, swal }: Props) {
     const navigate = useNavigate();
     const { favoriteIds, removeFavorite } = useFavoritesContext();
     const { data } = useGetContactListByIds(favoriteIds);
     const { deleteContact } = useDeleteContact();
-    const { refetch } = useGetAllContacts(searchQuery, page);
 
     const favContacts = useMemo(() => {
         return data?.contact.map(mapContactData) || [];
@@ -45,14 +48,25 @@ export default function Favorite({ searchQuery, page }: Props) {
     const handleDelete = useCallback(
         (e: SyntheticEvent, id: number) => {
             e.stopPropagation();
-            deleteContact(id, {
-                onSuccess: () => {
-                    removeFavorite(id);
-                    refetch();
+            swal.fire({
+                icon: 'question',
+                title: 'One second',
+                text: 'Are you sure want to delete this contact?',
+                showCancelButton: true
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    deleteContact(id, {
+                        onSuccess: () => {
+                            removeFavorite(id);
+                            setTimeout(() => {
+                                refetch();
+                            }, 0);
+                        }
+                    });
                 }
             });
         },
-        [deleteContact, refetch, removeFavorite]
+        [deleteContact, refetch, removeFavorite, swal]
     );
 
     return (
@@ -84,3 +98,5 @@ export default function Favorite({ searchQuery, page }: Props) {
         </>
     );
 }
+
+export default withSwal(Favorite);

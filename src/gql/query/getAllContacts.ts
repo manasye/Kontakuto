@@ -24,7 +24,6 @@ const GET_ALL_CONTACTS = gql`
         contact(
             offset: $offset
             limit: $limit
-            order_by: [{ first_name: asc }]
             where: {
                 id: { _nin: $excludedIds }
                 _or: [
