@@ -25,7 +25,6 @@ export default function useAddContact() {
             },
           },
         });
-        console.log(res);
         onSuccess?.(res.data?.insert_contact_one.id);
       } catch (e) {
         onError?.(e as Error);

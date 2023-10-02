@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import TextInput from "../../../components/Input/Input";
 import styled from "@emotion/styled";
 import { ContactDetailProps, NameContainer } from "../ContactDetail";
@@ -9,7 +9,8 @@ import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { phoneNumberCheck } from "../../../utils/regex";
 import useAddContact from "../../../hooks/api/useAddContact";
 import { withSwal } from "react-sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import useEditContact from "../../../hooks/api/useEditContact";
 
 interface Props extends Partial<ContactDetailProps> {
   setToViewMode: () => void;
@@ -54,7 +55,11 @@ function InputForm({
     name: "phoneNumbers",
   });
 
+  const param = useParams();
   const { postAddContact, loading: isLoadingAddContact } = useAddContact();
+  const { postEditContact, loading: isLoadingEditContact } = useEditContact(
+    Number(param.id)
+  );
 
   const onSubmit = useCallback(
     (data: ContactDetailProps) => {
@@ -67,7 +72,25 @@ function InputForm({
               icon: "success",
             });
             setToViewMode();
-            navigate(`/detail/${id}`);
+            navigate(`/detail/${id}`, { replace: true });
+          },
+          onError: () => {
+            swal.fire({
+              title: "Error",
+              text: "Phone number can't be duplicate",
+              icon: "error",
+            });
+          },
+        });
+      } else {
+        postEditContact(data, {
+          onSuccess: () => {
+            swal.fire({
+              title: "Success",
+              text: "Contact has been edited successfully",
+              icon: "success",
+            });
+            setToViewMode();
           },
           onError: () => {
             swal.fire({
@@ -79,7 +102,7 @@ function InputForm({
         });
       }
     },
-    [isNew, navigate, postAddContact, setToViewMode, swal]
+    [isNew, navigate, postAddContact, postEditContact, setToViewMode, swal]
   );
 
   const validateFirstName = useCallback((value: string) => {
@@ -180,7 +203,13 @@ function InputForm({
         <Button variant="secondary" onClick={handleCancel} className="mr-8">
           Cancel
         </Button>
-        <Button variant="primary" type="submit" disabled={!isValid}>
+        <Button
+          variant="primary"
+          type="submit"
+          disabled={!isValid}
+          loading={isLoadingAddContact || isLoadingEditContact}
+          className="min-w-80"
+        >
           Save
         </Button>
       </ButtonContainer>
