@@ -1,4 +1,4 @@
 export default interface Callback {
-    onSuccess?: () => void;
-    onError?: (e: Error) => void;
+  onSuccess?: (param?: unknown) => void;
+  onError?: (e: Error) => void;
 }

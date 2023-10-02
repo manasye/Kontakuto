@@ -45,3 +45,7 @@ code {
 .font-medium {
     font-weight: 500;
 }
+
+.min-w-80 {
+    min-width: 80px;
+}

@@ -1,158 +1,259 @@
-import React, { useCallback } from 'react';
-import TextInput from '../../../components/Input/Input';
-import styled from '@emotion/styled';
-import { ContactDetailProps, NameContainer } from '../ContactDetail';
-import { Label } from '../../../components/Input/Input.style';
-import Button from '../../../components/Button';
-import Icons from '../../../components/Icons';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { phoneNumberCheck } from '../../../utils/regex';
+import React, { useCallback } from "react";
+import TextInput from "../../../components/Input/Input";
+import styled from "@emotion/styled";
+import { ContactDetailProps, NameContainer } from "../ContactDetail";
+import { Label } from "../../../components/Input/Input.style";
+import Button from "../../../components/Button";
+import Icons from "../../../components/Icons";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { phoneNumberCheck } from "../../../utils/regex";
+import useAddContact from "../../../hooks/api/useAddContact";
+import { withSwal } from "react-sweetalert2";
+import { useNavigate, useParams } from "react-router-dom";
+import useEditContact from "../../../hooks/api/useEditContact";
+import useCheckExistingName from "../../../hooks/api/useCheckExistingName";
 
 interface Props extends Partial<ContactDetailProps> {
-    handleCancel: () => void;
+  setToViewMode: () => void;
+  handleCancel: () => void;
+  isNew?: boolean;
 }
 
 const Container = styled.form`
-    padding-bottom: 12px;
+  padding-bottom: 12px;
 `;
 
 const ButtonContainer = styled.div`
-    display: flex;
-    margin-top: 24px;
+  display: flex;
+  margin-top: 24px;
 `;
 
-export default function InputForm({
-    firstName,
-    lastName,
-    phoneNumbers = [],
-    handleCancel
-}: Props) {
-    const {
-        handleSubmit,
-        control,
-        formState: { errors, isValid },
-        trigger
-    } = useForm<ContactDetailProps>({
-        mode: 'onBlur',
-        defaultValues: {
-            firstName,
-            lastName,
-            phoneNumbers
-        }
-    });
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: 'phoneNumbers'
-    });
+function InputForm({
+  firstName = "",
+  lastName = "",
+  phoneNumbers = [],
+  handleCancel,
+  isNew,
+  setToViewMode,
+  swal,
+}: Props & { swal: { fire: (param: unknown) => void } }) {
+  const navigate = useNavigate();
+  const {
+    handleSubmit,
+    control,
+    formState: { errors, isValid, isDirty },
+    getValues,
+    trigger,
+  } = useForm<ContactDetailProps>({
+    mode: "onBlur",
+    defaultValues: {
+      firstName,
+      lastName,
+      phoneNumbers,
+    },
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "phoneNumbers",
+  });
 
-    const onSubmit = (data: ContactDetailProps) => {
-        console.log(data);
-    };
+  const param = useParams();
+  const { checkExistingName } = useCheckExistingName();
+  const { postAddContact, loading: isLoadingAddContact } = useAddContact();
+  const { postEditContact, loading: isLoadingEditContact } = useEditContact(
+    Number(param.id)
+  );
 
-    const validateFirstName = useCallback((value: string) => {
-        if (value) {
-            return true;
+  const onSubmit = useCallback(
+    (data: ContactDetailProps) => {
+      if (isNew) {
+        postAddContact(data, {
+          onSuccess: (id) => {
+            swal.fire({
+              title: "Success",
+              text: "Contact has been added successfully",
+              icon: "success",
+            });
+            setToViewMode();
+            navigate(`/detail/${id}`, { replace: true });
+          },
+          onError: () => {
+            swal.fire({
+              title: "Error",
+              text: "Phone number can't be duplicate",
+              icon: "error",
+            });
+          },
+        });
+      } else {
+        postEditContact(
+          data,
+          { firstName, lastName, phoneNumbers },
+          {
+            onSuccess: () => {
+              swal.fire({
+                title: "Success",
+                text: "Contact has been edited successfully",
+                icon: "success",
+              });
+              setToViewMode();
+            },
+            onError: () => {
+              swal.fire({
+                title: "Error",
+                text: "Phone number can't be duplicate",
+                icon: "error",
+              });
+            },
+          }
+        );
+      }
+    },
+    [
+      firstName,
+      isNew,
+      lastName,
+      navigate,
+      phoneNumbers,
+      postAddContact,
+      postEditContact,
+      setToViewMode,
+      swal,
+    ]
+  );
+
+  const validateFirstName = useCallback(
+    async (value: string) => {
+      if (value) {
+        const isThereExisting = await checkExistingName(
+          value,
+          getValues().lastName
+        );
+        if (isThereExisting) {
+          return "Name must be unique";
         } else {
-            return 'First name is required';
+          return true;
         }
-    }, []);
+      } else {
+        return "First name is required";
+      }
+    },
+    [checkExistingName, getValues]
+  );
 
-    const validateLastName = useCallback((value: string) => {
-        if (value) {
-            return true;
+  const validateLastName = useCallback(
+    async (value: string) => {
+      if (value) {
+        const isThereExisting = await checkExistingName(
+          getValues().firstName,
+          value
+        );
+        if (isThereExisting) {
+          return "Name must be unique";
         } else {
-            return 'Last name is required';
+          return true;
         }
-    }, []);
+      } else {
+        return "Last name is required";
+      }
+    },
+    [checkExistingName, getValues]
+  );
 
-    const validatePhoneNumber = useCallback(({ value }: { value: string }) => {
-        return phoneNumberCheck(value) || 'Phone Number must be valid';
-    }, []);
+  const validatePhoneNumber = useCallback(({ value }: { value: string }) => {
+    return phoneNumberCheck(value) || "Phone Number must be valid";
+  }, []);
 
-    return (
-        <Container onSubmit={handleSubmit(onSubmit)}>
-            <NameContainer>
-                <Controller
-                    name="firstName"
-                    control={control}
-                    defaultValue={firstName || ''}
-                    rules={{ validate: validateFirstName }}
-                    render={({ field }) => (
-                        <TextInput
-                            label="First Name"
-                            value={field.value}
-                            onChange={(value) => {
-                                field.onChange(value);
-                                trigger('firstName');
-                            }}
-                            errorMessage={errors.firstName?.message}
-                        />
-                    )}
-                />
-                <Controller
-                    name="lastName"
-                    control={control}
-                    defaultValue={lastName || ''}
-                    rules={{ validate: validateLastName }}
-                    render={({ field }) => (
-                        <TextInput
-                            label="Last Name"
-                            value={field.value}
-                            onChange={(value) => {
-                                field.onChange(value);
-                                trigger('lastName');
-                            }}
-                            errorMessage={errors.lastName?.message}
-                        />
-                    )}
-                />
-            </NameContainer>
+  return (
+    <Container onSubmit={handleSubmit(onSubmit)}>
+      <NameContainer>
+        <Controller
+          name="firstName"
+          control={control}
+          defaultValue={firstName || ""}
+          rules={{ validate: validateFirstName }}
+          render={({ field }) => (
+            <TextInput
+              label="First Name"
+              value={field.value}
+              onChange={(value) => {
+                field.onChange(value);
+                trigger("firstName");
+              }}
+              errorMessage={errors.firstName?.message}
+            />
+          )}
+        />
+        <Controller
+          name="lastName"
+          control={control}
+          defaultValue={lastName || ""}
+          rules={{ validate: validateLastName }}
+          render={({ field }) => (
+            <TextInput
+              label="Last Name"
+              value={field.value}
+              onChange={(value) => {
+                field.onChange(value);
+                trigger("lastName");
+              }}
+              errorMessage={errors.lastName?.message}
+            />
+          )}
+        />
+      </NameContainer>
 
-            <div className="mb-8">
-                <Label>Phone Number</Label>
-            </div>
-            {fields.map((field, index) => (
-                <Controller
-                    key={field.id}
-                    name={`phoneNumbers.${index}`}
-                    control={control}
-                    rules={{ validate: validatePhoneNumber }}
-                    render={({ field }) => (
-                        <TextInput
-                            value={field.value.value}
-                            onChange={(value) => {
-                                field.onChange({ value });
-                                trigger(`phoneNumbers.${index}`);
-                            }}
-                            appendedButton={
-                                <Button
-                                    variant="danger"
-                                    size="sm"
-                                    onClick={() => remove(index)}>
-                                    <Icons name="delete" color="white" />
-                                </Button>
-                            }
-                            errorMessage={errors.phoneNumbers?.[index]?.message}
-                        />
-                    )}
-                />
-            ))}
-
-            <Button onClick={() => append({ value: '' })}>
-                <Icons name="add" color="white" className="mr-4" /> New Number
-            </Button>
-
-            <ButtonContainer>
+      <div className="mb-8">
+        <Label>Phone Number</Label>
+      </div>
+      {fields.map((field, index) => (
+        <Controller
+          key={field.id}
+          name={`phoneNumbers.${index}`}
+          control={control}
+          rules={{ validate: validatePhoneNumber }}
+          render={({ field }) => (
+            <TextInput
+              value={field.value.value}
+              onChange={(value) => {
+                field.onChange({ value });
+                trigger(`phoneNumbers.${index}`);
+              }}
+              appendedButton={
                 <Button
-                    variant="secondary"
-                    onClick={handleCancel}
-                    className="mr-8">
-                    Cancel
+                  variant="danger"
+                  size="sm"
+                  onClick={() => remove(index)}
+                >
+                  <Icons name="delete" color="white" />
                 </Button>
-                <Button variant="primary" type="submit" disabled={!isValid}>
-                    Save
-                </Button>
-            </ButtonContainer>
-        </Container>
-    );
+              }
+              errorMessage={errors.phoneNumbers?.[index]?.message}
+            />
+          )}
+        />
+      ))}
+
+      <Button onClick={() => append({ value: "" })}>
+        <Icons name="add" color="white" className="mr-4" /> New Number
+      </Button>
+
+      <ButtonContainer>
+        <Button variant="secondary" onClick={handleCancel} className="mr-8">
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          type="submit"
+          disabled={!isValid || !isDirty}
+          loading={isLoadingAddContact || isLoadingEditContact}
+          className="min-w-80"
+        >
+          Save
+        </Button>
+      </ButtonContainer>
+    </Container>
+  );
 }
+
+export default withSwal(InputForm);

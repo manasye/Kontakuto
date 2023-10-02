@@ -48,7 +48,7 @@ export default function AllContact({
         loading,
         refetch
     } = useGetAllContacts(searchQuery, page);
-    const { loading: isLoadingDelete, deleteContact } = useDeleteContact();
+    const { deleteContact } = useDeleteContact();
 
     const handleSearchChange = (value: string) => {
         setSearchQuery(value);
