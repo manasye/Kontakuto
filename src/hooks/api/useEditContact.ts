@@ -4,9 +4,9 @@ import { ContactDetailProps } from "../../pages/DetailPage/ContactDetail";
 import Callback from "../../types/Callback";
 import EDIT_CONTACT from "../../gql/mutation/editContact";
 import EditContactResponse from "../../types/EditContactResponse";
-import DELETE_PHONE_NUMBERS from "../../gql/mutation/deletePhoneNumbers";
-import ADD_PHONE_NUMBERS from "../../gql/mutation/addPhoneNumbers";
-import EDIT_PHONE_NUMBER from "../../gql/mutation/editPhoneNumber";
+// import DELETE_PHONE_NUMBERS from "../../gql/mutation/deletePhoneNumbers";
+// import ADD_PHONE_NUMBERS from "../../gql/mutation/addPhoneNumbers";
+// import EDIT_PHONE_NUMBER from "../../gql/mutation/editPhoneNumber";
 
 export default function useEditContact(id: number) {
   const [mutateEditName, { loading: isLoadingEditName }] =
@@ -14,12 +14,12 @@ export default function useEditContact(id: number) {
       refetchQueries: ["GET_CONTACTS"],
     });
 
-  const [deletePhoneNumbers, { loading: isLoadingDeletePhoneNumbers }] =
-    useMutation(DELETE_PHONE_NUMBERS);
-  const [addPhoneNumbers, { loading: isLoadingAddPhoneNumbers }] =
-    useMutation(ADD_PHONE_NUMBERS);
-  const [editPhoneNumber, { loading: isLoadingEditPhoneNumber }] =
-    useMutation(EDIT_PHONE_NUMBER);
+  // const [deletePhoneNumbers, { loading: isLoadingDeletePhoneNumbers }] =
+  //   useMutation(DELETE_PHONE_NUMBERS);
+  // const [addPhoneNumbers, { loading: isLoadingAddPhoneNumbers }] =
+  //   useMutation(ADD_PHONE_NUMBERS);
+  // const [editPhoneNumber, { loading: isLoadingEditPhoneNumber }] =
+  //   useMutation(EDIT_PHONE_NUMBER);
 
   const postEditContact = useCallback(
     async (
@@ -50,11 +50,11 @@ export default function useEditContact(id: number) {
   );
 
   return {
-    loading:
-      isLoadingEditName ||
-      isLoadingDeletePhoneNumbers ||
-      isLoadingAddPhoneNumbers ||
-      isLoadingEditPhoneNumber,
+    loading: isLoadingEditName,
+    // ||
+    // isLoadingDeletePhoneNumbers ||
+    // isLoadingAddPhoneNumbers ||
+    // isLoadingEditPhoneNumber
     postEditContact,
   } as const;
 }
