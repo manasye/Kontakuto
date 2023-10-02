@@ -59,7 +59,8 @@ function InputForm({
 
     const param = useParams();
     const contactId = param.id === 'new' ? -1 : Number(param.id);
-    const { checkExistingName } = useCheckExistingName(contactId);
+    const { checkExistingName, loading: isLoadingCheckExistingName } =
+        useCheckExistingName(contactId);
     const { postAddContact, loading: isLoadingAddContact } = useAddContact();
     const { postEditContact, loading: isLoadingEditContact } =
         useEditContact(contactId);
@@ -90,6 +91,7 @@ function InputForm({
                             text: 'Contact has been added successfully',
                             icon: 'success'
                         });
+
                         setToViewMode();
                         navigate(`/detail/${id}`, { replace: true });
                     },
@@ -252,7 +254,11 @@ function InputForm({
                     variant="primary"
                     type="submit"
                     disabled={!isValid || !isDirty}
-                    loading={isLoadingAddContact || isLoadingEditContact}
+                    loading={
+                        isLoadingAddContact ||
+                        isLoadingEditContact ||
+                        isLoadingCheckExistingName
+                    }
                     className="min-w-80">
                     Save
                 </Button>
