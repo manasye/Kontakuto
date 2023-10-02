@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useCallback, useMemo, useState } from 'react';
+import React, { SyntheticEvent, useCallback, useMemo } from 'react';
 import ContactContainer from '../../../components/ContactContainer';
 import Title from '../../../components/Title';
 import ContactCard from '../../../components/ContactCard';
