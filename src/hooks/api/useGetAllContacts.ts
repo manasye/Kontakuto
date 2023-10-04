@@ -30,13 +30,8 @@ export default function useGetAllContacts(query = '', page = 1) {
         return () => {
             callRefetch.cancel();
         };
-    }, [query, refetch]);
-
-    useEffect(() => {
-        refetch({
-            offset: (page - 1) * PER_PAGE
-        });
-    }, [page, refetch]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [query]);
 
     return {
         data,

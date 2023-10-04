@@ -1,4 +1,10 @@
-import React, { ReactNode, createContext, useContext } from 'react';
+import React, {
+    ReactNode,
+    createContext,
+    useCallback,
+    useContext,
+    useEffect
+} from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 
 interface FavoritesContextType {
@@ -29,14 +35,20 @@ export const FavoritesProvider: React.FC<{
         []
     );
 
-    const removeFavorite = (id: number) => {
-        const newFavs = favoriteIds.filter((favId) => favId !== id);
-        setFavoriteIds(newFavs);
-    };
+    const removeFavorite = useCallback(
+        (id: number) => {
+            const newFavs = favoriteIds.filter((favId) => favId !== id);
+            setFavoriteIds(newFavs);
+        },
+        [favoriteIds, setFavoriteIds]
+    );
 
-    const addNewFavorite = (id: number) => {
-        setFavoriteIds([...favoriteIds, id]);
-    };
+    const addNewFavorite = useCallback(
+        (id: number) => {
+            setFavoriteIds([...favoriteIds, id]);
+        },
+        [favoriteIds, setFavoriteIds]
+    );
 
     return (
         <FavoritesContext.Provider

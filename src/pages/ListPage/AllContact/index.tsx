@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useCallback, useMemo } from 'react';
+import React, { SyntheticEvent, memo, useCallback, useMemo } from 'react';
 import ContactContainer from '../../../components/ContactContainer';
 import Title from '../../../components/Title';
 import ContactCard from '../../../components/ContactCard';
@@ -56,10 +56,13 @@ function AllContact({
     const { addNewFavorite } = useFavoritesContext();
     const { deleteContact } = useDeleteContact();
 
-    const handleSearchChange = (value: string) => {
-        setSearchQuery(value);
-        setPage(1);
-    };
+    const handleSearchChange = useCallback(
+        (value: string) => {
+            setSearchQuery(value);
+            setPage(1);
+        },
+        [setPage, setSearchQuery]
+    );
 
     const contacts = useMemo(() => {
         return contactData?.contact.map(mapContactData) || [];
@@ -105,6 +108,16 @@ function AllContact({
         [addNewFavorite]
     );
 
+    const handleChangePage = useCallback(
+        (newPage: number) => {
+            setPage(newPage);
+            refetch({
+                offset: (newPage - 1) * PER_PAGE
+            });
+        },
+        [refetch, setPage]
+    );
+
     const totalItems = contactData?.contact_aggregate.aggregate.count || 0;
     const totalPages = Math.ceil(totalItems / PER_PAGE);
 
@@ -145,11 +158,11 @@ function AllContact({
                 <Pagination
                     currentPage={page}
                     totalPages={totalPages}
-                    onPageChange={setPage}
+                    onPageChange={handleChangePage}
                 />
             )}
         </>
     );
 }
 
-export default withSwal(AllContact);
+export default withSwal(memo(AllContact));

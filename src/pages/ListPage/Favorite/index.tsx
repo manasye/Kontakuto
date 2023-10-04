@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useCallback, useMemo } from 'react';
+import React, { SyntheticEvent, memo, useCallback, useMemo } from 'react';
 import Title from '../../../components/Title';
 import Text from '../../../components/Text';
 import { colorToken } from '../../../tokens/color';
@@ -99,4 +99,4 @@ function Favorite({ refetch, swal }: Props) {
     );
 }
 
-export default withSwal(Favorite);
+export default withSwal(memo(Favorite));
