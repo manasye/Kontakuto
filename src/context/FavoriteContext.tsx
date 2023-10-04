@@ -2,8 +2,7 @@ import React, {
     ReactNode,
     createContext,
     useCallback,
-    useContext,
-    useEffect
+    useContext
 } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 
