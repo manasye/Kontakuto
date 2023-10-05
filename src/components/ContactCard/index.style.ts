@@ -1,63 +1,63 @@
-import styled from '@emotion/styled';
-import { colorToken } from '../../tokens/color';
+import styled from "@emotion/styled";
+import { colorToken } from "../../tokens/color";
 
 export const ContactCardContainer = styled.div`
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
 
-    &:hover {
-        background-color: #f0f0f0;
-    }
+  &:hover {
+    background-color: #f0f0f0;
+  }
 
-    @media (min-width: 768px) {
-        padding: 12px;
-    }
+  @media (min-width: 768px) {
+    padding: 12px;
+  }
 `;
 
 export const Avatar = styled.div<{ bgColor?: string }>`
-    width: 48px;
-    height: 48px;
-    background-color: ${(props) => props.bgColor || colorToken.blue};
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    font-size: 20px;
+  width: 48px;
+  height: 48px;
+  background-color: ${(props) => props.bgColor || colorToken.blue};
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  font-size: 20px;
 `;
 
 export const ContactRightSide = styled.div`
-    margin-left: 16px;
-    display: flex;
-    justify-content: space-between;
-    flex: 1;
-    align-items: center;
+  margin-left: 16px;
+  display: flex;
+  justify-content: space-between;
+  flex: 1;
+  align-items: center;
 `;
 
 export const Name = styled.h3`
-    font-size: 18px;
-    margin: 0;
-    color: ${colorToken.gray};
-    overflow-x: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 230px;
+  font-size: 18px;
+  margin: 0;
+  color: ${colorToken.gray};
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 230px;
 
-    @media (min-width: 768px) {
-        max-width: 180px;
-    }
+  @media (min-width: 768px) {
+    max-width: 180px;
+  }
 `;
 
 export const PhoneNumber = styled.p`
-    font-size: 14px;
-    margin: 0;
-    color: rgb(148, 148, 149);
+  font-size: 14px;
+  margin: 0;
+  color: rgb(148, 148, 149);
 `;
 
 export const ActionButtons = styled.div`
-    display: flex;
+  display: flex;
 `;

@@ -1,46 +1,46 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 const GET_ALL_CONTACTS = gql`
-    query GET_ALL_CONTACTS(
-        $query: String = ""
-        $offset: Int = 0
-        $limit: Int = 10
-        $excludedIds: [Int!] = []
+  query GET_ALL_CONTACTS(
+    $query: String = ""
+    $offset: Int = 0
+    $limit: Int = 10
+    $excludedIds: [Int!] = []
+  ) {
+    contact_aggregate(
+      where: {
+        id: { _nin: $excludedIds }
+        _or: [
+          { first_name: { _iregex: $query } }
+          { last_name: { _iregex: $query } }
+          { phones: { number: { _iregex: $query } } }
+        ]
+      }
     ) {
-        contact_aggregate(
-            where: {
-                id: { _nin: $excludedIds }
-                _or: [
-                    { first_name: { _iregex: $query } }
-                    { last_name: { _iregex: $query } }
-                    { phones: { number: { _iregex: $query } } }
-                ]
-            }
-        ) {
-            aggregate {
-                count
-            }
-        }
-        contact(
-            offset: $offset
-            limit: $limit
-            where: {
-                id: { _nin: $excludedIds }
-                _or: [
-                    { first_name: { _iregex: $query } }
-                    { last_name: { _iregex: $query } }
-                    { phones: { number: { _iregex: $query } } }
-                ]
-            }
-        ) {
-            id
-            first_name
-            last_name
-            phones {
-                number
-            }
-        }
+      aggregate {
+        count
+      }
     }
+    contact(
+      offset: $offset
+      limit: $limit
+      where: {
+        id: { _nin: $excludedIds }
+        _or: [
+          { first_name: { _iregex: $query } }
+          { last_name: { _iregex: $query } }
+          { phones: { number: { _iregex: $query } } }
+        ]
+      }
+    ) {
+      id
+      first_name
+      last_name
+      phones {
+        number
+      }
+    }
+  }
 `;
 
 export default GET_ALL_CONTACTS;

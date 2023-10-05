@@ -80,7 +80,7 @@ function InputForm({
     async (data: ContactDetailProps) => {
       const isThereExistingName = await checkExistingName(
         data.firstName,
-        data.lastName
+        data.lastName,
       );
       if (isThereExistingName) {
         setError("firstName", {
@@ -134,7 +134,7 @@ function InputForm({
                 icon: "error",
               });
             },
-          }
+          },
         );
       }
     },
@@ -150,7 +150,7 @@ function InputForm({
       setError,
       setToViewMode,
       swal,
-    ]
+    ],
   );
 
   console.log(errors);

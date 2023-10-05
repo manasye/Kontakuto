@@ -1,51 +1,51 @@
 body {
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-        monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
 }
 
 .mt-4 {
-    margin-top: 4px;
+  margin-top: 4px;
 }
 
 .mt-8 {
-    margin-top: 8px;
+  margin-top: 8px;
 }
 
 .mt-16 {
-    margin-top: 16px;
+  margin-top: 16px;
 }
 
 .mb-8 {
-    margin-bottom: 8px;
+  margin-bottom: 8px;
 }
 
 .mr-4 {
-    margin-right: 4px;
+  margin-right: 4px;
 }
 
 .mr-8 {
-    margin-right: 8px;
+  margin-right: 8px;
 }
 
 .pt-4 {
-    padding-top: 4px;
+  padding-top: 4px;
 }
 
 .cursor-pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .font-medium {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .min-w-80 {
-    min-width: 80px;
+  min-width: 80px;
 }
